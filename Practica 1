@@ -1,0 +1,33 @@
+# Instalar NFS en el servidor
+sudo apt install nfs-kernel-server
+
+# Crear carpeta compartida y los archivos
+sudo mkdir -p /srv/OS3/
+cd /srv/OS3/
+sudo touch Adrian{1..100}.txt
+ls
+sudo chown -R nobody:nogroup /srv/OS3
+sudo chmod 755 /srv/OS3
+
+# Editar /etc/exports
+sudo nano /etc/exports
+# (Dentro del archivo agrega esta línea y guarda)
+# /srv/OS3 192.168.255.128/24(rw,sync,no_subtree_check)
+
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+sudo touch hola.txt
+ls
+cd
+
+# En la máquina cliente
+sudo apt install nfs-common -y
+sudo mkdir -p /mnt/OS3
+sudo mount 192.168.255.130:/srv/OS3 /mnt/OS3
+ls /mnt/OS3
+sudo nano /etc/fstab
+# (Dentro del archivo agrega esta línea y guarda)
+# 192.168.255.130:/srv/OS3 /mnt/OS3 nfs defaults 0 0
+
+sudo reboot
+ls /mnt/OS3
