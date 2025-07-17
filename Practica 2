@@ -1,0 +1,44 @@
+# Actualizar repositorios
+sudo apt update
+
+# Instalar Samba
+sudo apt install samba -y
+
+# Habilitar e iniciar el servicio smbd
+sudo systemctl enable smbd
+sudo systemctl start smbd
+
+# Crear carpeta a compartir
+sudo mkdir -p /srv/samba/shared
+
+# Crear grupo sambashare (si no existe)
+sudo groupadd sambashare
+
+# Crear usuario sin acceso al shell
+sudo useradd -M -s /sbin/nologin adrian1
+
+# Agregar el usuario al grupo sambashare
+sudo usermod -aG sambashare adrian1
+
+# Asignar contraseña para Samba
+sudo smbpasswd -a adrian1
+
+# Cambiar propietario de la carpeta compartida
+sudo chown -R adrian1:sambashare /srv/samba/shared
+
+# Asignar permisos (rwx para grupo, sin acceso para otros)
+sudo chmod -R 2770 /srv/samba/shared
+
+# Editar configuración de Samba
+sudo nano /etc/samba/smb.conf
+
+# Agregar en la ultima linie del archivo smb.conf
+[Shared]
+   path = /srv/samba/shared
+   valid users = adrian1
+   guest ok = no
+   writable = yes
+   browsable = yes
+
+# Reiniciar el servicio para aplicar cambios
+sudo systemctl restart smbd
